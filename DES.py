@@ -117,16 +117,9 @@ def Mixing(subkey, mensajePermutado):
 		smpe = smpe + c
 
 	print(ssk, smpe)
-	xorarg1 = mp[ssk[0:4]]
-	xorarg2 = mp[smpe[0:4]]
-	xorarg3 = mp[ssk[4:8]]
-	xorarg4 = mp[smpe[4:8]]
 
-	xorarg1 = xorarg1+xorarg3
-	xorarg2 = xorarg2+xorarg4
-
-	XOR = xorarg1 ^ xorarg2
-
+	XOR = int(ssk,2) ^ int(smpe,2)
+	
 	XOR = format(XOR,'08b')
 	print("XOR",XOR)
 
@@ -229,10 +222,10 @@ if __name__ == '__main__':
 	for c in strStep3[0:4]:
 		strConcatStep4 = strConcatStep4 + c
 	strConcatStep4 = strConcatStep4+mix2
-	print(strConcatStep4)
+	print("paso 4: ", strConcatStep4)
 
 	encrypted = InversePermutation(strConcatStep4)
-	print(encrypted)
+	print("encrypted", encrypted)
 
 
 # Antes de enviar a alphagrader: 
