@@ -5,22 +5,22 @@ import fileinput
 sBoxS0 = [[1,0,3,2], [3,2,1,0], [0,2,1,3], [3,1,3,2]]
 sBoxS1 = [[0,1,2,3], [2,0,1,3], [3,0,1,0], [2,1,0,3]]
 
-mp = 	{ "0000": 0,
-          "0001": 1,
-          "0010": 2,
-          "0011": 3,
-          "0100": 4,
-          "0101": 5,
-          "0110": 6,
-          "0111": 7,
-          "1000": 8,
-          "1001": 9,
-          "1010": 10,
-          "1011": 11,
-          "1100": 12,
-          "1101": 13,
-          "1110": 14,
-          "1111": 15}
+# mp = 	{ "0000": 0,
+#           "0001": 1,
+#           "0010": 2,
+#           "0011": 3,
+#           "0100": 4,
+#           "0101": 5,
+#           "0110": 6,
+#           "0111": 7,
+#           "1000": 8,
+#           "1001": 9,
+#           "1010": 10,
+#           "1011": 11,
+#           "1100": 12,
+#           "1101": 13,
+#           "1110": 14,
+#           "1111": 15}
 		
 
 def Subkeys(clave):
@@ -98,15 +98,20 @@ def Shift(arr, n):
 
 
 def Mixing(subkey, mensajePermutado):
+	mensajePermutado2 = []
+	# print(mensajePermutado[4:8])
+	for x in mensajePermutado[4:8]:
+		mensajePermutado2.append(x)
+	#print(mensajePermutado2)
 	mensajePermutadoExpanded = [None] * 8
-	mensajePermutadoExpanded[0] = mensajePermutado[3]
-	mensajePermutadoExpanded[1] = mensajePermutado[0]
-	mensajePermutadoExpanded[2] = mensajePermutado[1]
-	mensajePermutadoExpanded[3] = mensajePermutado[2]
-	mensajePermutadoExpanded[4] = mensajePermutado[1]
-	mensajePermutadoExpanded[5] = mensajePermutado[2]
-	mensajePermutadoExpanded[6] = mensajePermutado[3]
-	mensajePermutadoExpanded[7] = mensajePermutado[0]
+	mensajePermutadoExpanded[0] = mensajePermutado2[3]
+	mensajePermutadoExpanded[1] = mensajePermutado2[0]
+	mensajePermutadoExpanded[2] = mensajePermutado2[1]
+	mensajePermutadoExpanded[3] = mensajePermutado2[2]
+	mensajePermutadoExpanded[4] = mensajePermutado2[1]
+	mensajePermutadoExpanded[5] = mensajePermutado2[2]
+	mensajePermutadoExpanded[6] = mensajePermutado2[3]
+	mensajePermutadoExpanded[7] = mensajePermutado2[0]
 
 	ssk = ""
 	for c in subkey:
@@ -116,28 +121,34 @@ def Mixing(subkey, mensajePermutado):
 	for c in mensajePermutadoExpanded:
 		smpe = smpe + c
 
-	print(ssk, smpe)
+	# print(ssk, smpe)
 
 	XOR = int(ssk,2) ^ int(smpe,2)
 	
 	XOR = format(XOR,'08b')
-	print("XOR",XOR)
+	# print("XOR",XOR)
 
 	XOR1 = XOR[0:4]
 	XOR2 = XOR[4:8]
 
-	row1 = XOR1[0:2]
-	col1 = XOR1[2:3]
-	row2 = XOR2[0:2]
-	col2 = XOR2[2:3]
+	row1 = XOR1[0] + XOR[3]
+	# print('row1', row1)
+	col1 = XOR1[1:3]
+	#print("col1", col1)
+	row2 = XOR2[0] + XOR[3]
+	# print("row2", row2)
+	col2 = XOR2[1:3]
+	# print("col2", col2)
 
 
-	sBoxS0Val = sBoxS0[int(col1,2)][int(row1,2)]
-	sBoxS1Val = sBoxS1[int(col2,2)][int(row2,2)]
+	sBoxS0Val = sBoxS0[int(row1,2)][int(col1,2)]
+	sBoxS1Val = sBoxS1[int(row2,2)][int(col2,2)]
 	binsBoxS0val = format(sBoxS0Val,'02b')
 	binsBoxS1val = format(sBoxS1Val,'02b')
-
+	print("s0",binsBoxS0val)
+	print("s1",binsBoxS1val)
 	concatS0S1 = str(binsBoxS0val) + str(binsBoxS1val)
+	print(concatS0S1)
 
 	concatS0S1Lst = []
 	for c in concatS0S1:
@@ -154,17 +165,19 @@ def Mixing(subkey, mensajePermutado):
 		scs0s1p = scs0s1p + c
 
 	smp = ""
-	for c in mensajePermutado:
+	for c in mensajePermutado[0:4]:
 		smp = smp + c
 
+	# print("permutados sbin", scs0s1p, smp)
+	# xorarg1 = mp[scs0s1p]
+	# xorarg2 = mp[smp]
 
-	xorarg1 = mp[scs0s1p]
-	xorarg2 = mp[smp]
-
-	XORs0s1permutLeftHalf = xorarg2 ^ xorarg1
+	#XORs0s1permutLeftHalf = xorarg2 ^ xorarg1
 	
-	output = format(XORs0s1permutLeftHalf,'04b')
+	XORs0s1permutLeftHalf = int(scs0s1p,2) ^ int(smp,2)
 
+	output = format(XORs0s1permutLeftHalf,'04b')
+	print(output)
 	return output
 
 def InitialPermutation(mensaje):
@@ -210,24 +223,29 @@ if __name__ == '__main__':
 		lines.append(line.rstrip("\n"))
 	subkey1, subkey2 = Subkeys(lines[0])
 	mensajePermutado = InitialPermutation(lines[1])
-	mix1 = Mixing(subkey1, mensajePermutado[4:8]) # Step 2
+	
+	mix1 = Mixing(subkey1, mensajePermutado) # Step 2
 	strConcatStep2 = ""
-	for c in mensajePermutado[0:4]:
+
+	for c in mensajePermutado[4:8]:
 		strConcatStep2 = strConcatStep2 + c
 	strStep3 = strConcatStep2+mix1 #Step 3
-	print(strStep3)
+	#print(strStep3)
 
-	mix2 = Mixing(subkey2, strStep3[4:8])
+	mix2 = Mixing(subkey2, strStep3)
+	# print("mix2", mix2)
 	strConcatStep4 = ""
-	for c in strStep3[0:4]:
+	for c in strStep3[4:8]:
 		strConcatStep4 = strConcatStep4 + c
-	strConcatStep4 = strConcatStep4+mix2
-	print("paso 4: ", strConcatStep4)
+	strConcatStep4 = mix2 + strConcatStep4
+	# print("paso 4: ", strConcatStep4)
 
 	encrypted = InversePermutation(strConcatStep4)
-	print("encrypted", encrypted)
+	print(''.join(encrypted))
+	# print("encrypted", encrypted)
+
 
 
 # Antes de enviar a alphagrader: 
 #	Borrar el archivo de prueba en al función input del main. 
-# 	Comentar todos los print
+#	Comentar todos los print
